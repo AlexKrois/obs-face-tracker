@@ -35,6 +35,7 @@ public:
 	std::shared_ptr<texture_object> cvtex_cache;
 	enum ptz_cmd_state_e ptz_last_cmd;
 	class ptz_backend *dev;
+	float landmark_smoothing;
 
 public:
 	ft_manager_for_ftptz(struct face_tracker_ptz *ctx_)
@@ -42,6 +43,7 @@ public:
 		ctx = ctx_;
 		cvtex_cache = NULL;
 		dev = NULL;
+		landmark_smoothing = 0.80f;
 	}
 
 	bool can_send_ptz_cmd()
@@ -218,6 +220,8 @@ static void ftptz_update(void *data, obs_data_t *settings)
 	s->debug_faces = obs_data_get_bool(settings, "debug_faces");
 	s->debug_notrack = obs_data_get_bool(settings, "debug_notrack");
 	s->debug_always_show = obs_data_get_bool(settings, "debug_always_show");
+	s->ftm->landmark_smoothing =
+		(float)obs_data_get_double(settings, "landmark_smoothing") * 0.01f;
 
 	debug_data_open(&s->debug_data_tracker, &s->debug_data_tracker_last, settings, "debug_data_tracker");
 	debug_data_open(&s->debug_data_error, &s->debug_data_error_last, settings, "debug_data_error");
@@ -460,6 +464,9 @@ static obs_properties_t *ftptz_properties(void *data)
 		obs_properties_t *pp = obs_properties_create();
 		obs_properties_add_bool(pp, "debug_faces", "Show face detection results");
 		obs_properties_add_bool(pp, "debug_always_show", "Always show information (useful for demo)");
+		obs_property_t *landmark_smoothing = obs_properties_add_float_slider(
+			pp, "landmark_smoothing", "Landmark smoothing", 0.0, 95.0, 1.0);
+		obs_property_float_set_suffix(landmark_smoothing, " %");
 #ifdef ENABLE_DEBUG_DATA
 		obs_properties_add_path(pp, "debug_data_tracker", "Save correlation tracker data to file",
 					OBS_PATH_FILE_SAVE, DEBUG_DATA_PATH_FILTER, NULL);
@@ -478,6 +485,7 @@ static void ftptz_get_defaults(obs_data_t *settings)
 {
 	obs_data_set_default_bool(settings, "preset_mask_track", true);
 	obs_data_set_default_bool(settings, "preset_mask_control", true);
+	obs_data_set_default_double(settings, "landmark_smoothing", 80.0);
 	face_tracker_manager::get_defaults(settings);
 	obs_data_set_default_double(settings, "tracking_th_dB",
 				    -40.0);                      // overwrite the default from face_tracker_manager
@@ -1039,10 +1047,11 @@ static struct obs_source_frame *ftptz_filter_video(void *data, struct obs_source
 
 static void draw_frame_info(struct face_tracker_ptz *s, bool landmark_only = false)
 {
-	bool draw_det = !landmark_only;
-	bool draw_trk = !landmark_only;
+	UNUSED_PARAMETER(landmark_only);
+	bool draw_det = false;
+	bool draw_trk = false;
 	bool draw_lmk = true;
-	bool draw_ref = !landmark_only;
+	bool draw_ref = false;
 	gs_effect_t *effect = obs_get_base_effect(OBS_EFFECT_SOLID);
 	while (gs_effect_loop(effect, "Solid")) {
 		if (draw_det) {
@@ -1058,7 +1067,7 @@ static void draw_frame_info(struct face_tracker_ptz *s, bool landmark_only = fal
 			if (draw_trk)
 				draw_rect_upsize(tr.rect);
 			if (draw_lmk && tr.landmark.size())
-				draw_landmark(tr.landmark);
+				draw_landmark(tr.landmark, s->ftm->landmark_smoothing);
 		}
 
 		if (draw_ref) {

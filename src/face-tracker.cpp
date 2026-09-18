@@ -33,6 +33,14 @@ public:
 		ctx = ctx_;
 		landmark_smoothing = 0.80f;
 		landmark_thickness = 5.1f;
+
+		char *model_path =
+			obs_module_file("face_mesh/face_mesh.onnx");
+
+		if (model_path) {
+			mesh_tracker.initialize(model_path);
+			bfree(model_path);
+		}
 	}
 
 	~ft_manager_for_ftf() { release_cvtex(); }

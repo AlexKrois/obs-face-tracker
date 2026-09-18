@@ -178,7 +178,26 @@ endif()
 
 setup_plugin_target(${CMAKE_PROJECT_NAME})
 
-configure_file(installer/installer-macOS.pkgproj.in installer-macOS.generated.pkgproj)
+if(OS_WINDOWS)
+	install(
+		FILES
+			"${ONNXRUNTIME_ROOT}/lib/onnxruntime.dll"
+		DESTINATION
+			"obs-plugins/64bit"
+	)
+
+	install(
+		FILES
+			"${CMAKE_CURRENT_SOURCE_DIR}/data/face_mesh/face_mesh.onnx"
+		DESTINATION
+			"data/obs-plugins/${CMAKE_PROJECT_NAME}/face_mesh"
+	)
+endif()
+
+configure_file(
+	installer/installer-macOS.pkgproj.in
+	installer-macOS.generated.pkgproj
+)
 
 if(ENABLE_DATAGEN)
 	add_executable(face-detector-dlib-hog-datagen

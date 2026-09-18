@@ -149,6 +149,14 @@ void draw_rect_upsize(rect_s r, float upsize_l = 0.0f, float upsize_r = 0.0f, fl
 void draw_landmark(const std::vector<pointf_s> &landmark,
 		   float smoothing,
 		   float thickness);
+
+struct face_mesh_point;
+
+void draw_face_mesh(const std::vector<face_mesh_point> &landmarks,
+		    float width,
+		    float height,
+		    float smoothing,
+		    float thickness);
 float landmark_area(const std::vector<pointf_s> &landmark);
 pointf_s landmark_center(const std::vector<pointf_s> &landmark);
 

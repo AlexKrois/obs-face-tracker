@@ -93,6 +93,9 @@ set(PLUGIN_SOURCES
 	src/ptz-backend.cpp
 	src/obsptz-backend.cpp
 	src/dummy-backend.cpp
+	src/face-mesh.cpp
+	src/face-mesh.hpp
+	src/face-mesh-connections.hpp
 )
 
 if (WITH_PTZ_TCP)

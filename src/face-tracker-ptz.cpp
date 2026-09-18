@@ -13,6 +13,7 @@
 #include "face-tracker-preset.h"
 #include "face-tracker-manager.hpp"
 #include "ptz-backend.hpp"
+#include "face-mesh.hpp"
 #include "obsptz-backend.hpp"
 #ifdef WITH_PTZ_TCP
 #include "libvisca-thread.hpp"
@@ -37,6 +38,7 @@ public:
 	class ptz_backend *dev;
 	float landmark_smoothing;
 	float landmark_thickness;
+	face_mesh_tracker mesh_tracker;
 
 public:
 	ft_manager_for_ftptz(struct face_tracker_ptz *ctx_)
@@ -1075,8 +1077,14 @@ static void draw_frame_info(struct face_tracker_ptz *s, bool landmark_only = fal
 			if (draw_trk)
 				draw_rect_upsize(tr.rect);
 			if (draw_lmk && tr.landmark.size())
-				draw_landmark(tr.landmark, s->ftm->landmark_smoothing,
-				      s->ftm->landmark_thickness);
+				if (s->ftm->mesh_tracker.has_face()) {
+					draw_face_mesh(
+						s->ftm->mesh_tracker.landmarks(),
+						(float)s->width,
+						(float)s->height,
+						s->ftm->landmark_smoothing,
+						s->ftm->landmark_thickness);
+				}
 		}
 
 		if (draw_ref) {

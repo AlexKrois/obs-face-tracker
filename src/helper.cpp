@@ -1,6 +1,8 @@
 #include <obs-module.h>
 #include "plugin-macros.generated.h"
 #include "helper.hpp"
+#include "face-mesh.hpp"
+#include "face-mesh-connections.hpp"
 
 #include <cmath>
 
@@ -38,6 +40,119 @@ static void draw_thick_rect(float x0, float y0, float x1, float y1, float thickn
 	draw_thick_line(p1, p2, thickness);
 	draw_thick_line(p2, p3, thickness);
 	draw_thick_line(p3, p0, thickness);
+}
+
+static void draw_mesh_connections(
+	const std::vector<pointf_s> &points,
+	const face_mesh_connection *connections,
+	size_t count,
+	float thickness)
+{
+	for (size_t i = 0; i < count; i++) {
+		const int a = connections[i].a;
+		const int b = connections[i].b;
+
+		if (a < 0 || b < 0)
+			continue;
+
+		if ((size_t)a >= points.size() ||
+		    (size_t)b >= points.size())
+			continue;
+
+		draw_thick_line(points[a], points[b], thickness);
+	}
+}
+
+void draw_face_mesh(const std::vector<face_mesh_point> &landmarks,
+		    float width,
+		    float height,
+		    float smoothing,
+		    float thickness)
+{
+	if (landmarks.empty())
+		return;
+
+	if (smoothing < 0.0f)
+		smoothing = 0.0f;
+
+	if (smoothing > 0.95f)
+		smoothing = 0.95f;
+
+	if (thickness < 0.5f)
+		thickness = 0.5f;
+
+	if (thickness > 20.0f)
+		thickness = 20.0f;
+
+	const float alpha = 1.0f - smoothing;
+
+	static std::vector<pointf_s> smoothed;
+
+	if (smoothed.size() != landmarks.size()) {
+		smoothed.resize(landmarks.size());
+
+		for (size_t i = 0; i < landmarks.size(); i++) {
+			smoothed[i].x = landmarks[i].x * width;
+			smoothed[i].y = landmarks[i].y * height;
+		}
+	} else {
+		for (size_t i = 0; i < landmarks.size(); i++) {
+
+			const float x =
+				landmarks[i].x * width;
+
+			const float y =
+				landmarks[i].y * height;
+
+			smoothed[i].x +=
+				(x - smoothed[i].x) * alpha;
+
+			smoothed[i].y +=
+				(y - smoothed[i].y) * alpha;
+		}
+	}
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_OVAL,
+		FACE_MESH_OVAL_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_LEFT_EYE,
+		FACE_MESH_LEFT_EYE_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_RIGHT_EYE,
+		FACE_MESH_RIGHT_EYE_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_LEFT_EYEBROW,
+		FACE_MESH_LEFT_EYEBROW_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_RIGHT_EYEBROW,
+		FACE_MESH_RIGHT_EYEBROW_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_NOSE,
+		FACE_MESH_NOSE_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_LIPS,
+		FACE_MESH_LIPS_COUNT,
+		thickness);
 }
 
 void draw_rect_upsize(rect_s r, float upsize_l, float upsize_r, float upsize_t, float upsize_b)

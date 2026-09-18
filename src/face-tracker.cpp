@@ -783,7 +783,8 @@ static inline std::shared_ptr<texture_object> surface_to_cvtex(struct face_track
 	cvtex->set_texture_obsframe(&frame, 1);
 
 	if (!s->ftm->tracker_rects.empty()) {
-		const auto &face = s->ftm->tracker_rects[0].rect;
+		const auto &face =
+			s->ftm->tracker_rects[0].rect;
 
 		s->ftm->mesh_tracker.process_frame(
 			video_data,
@@ -795,6 +796,8 @@ static inline std::shared_ptr<texture_object> surface_to_cvtex(struct face_track
 			face.y0,
 			face.x1,
 			face.y1);
+	} else {
+		s->ftm->mesh_tracker.reset_tracking();
 	}
 
 	gs_stagesurface_unmap(s->stagesurface);

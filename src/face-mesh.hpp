@@ -21,6 +21,8 @@ public:
 	bool initialize(const char *model_path);
 	void shutdown();
 
+	void reset_tracking();
+
 	bool process_frame(
 		const uint8_t *data,
 		int width,
@@ -43,4 +45,9 @@ private:
 
 	std::vector<face_mesh_point> points;
 	bool face_found = false;
+
+	bool roi_initialized = false;
+	float roi_center_x = 0.0f;
+	float roi_center_y = 0.0f;
+	float roi_size = 0.0f;
 };

@@ -199,6 +199,11 @@ void face_mesh_tracker::shutdown()
 
 	points.clear();
 	face_found = false;
+
+	roi_initialized = false;
+	roi_center_x = 0.0f;
+	roi_center_y = 0.0f;
+	roi_size = 0.0f;
 }
 
 
@@ -233,41 +238,89 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 	 *
 	 * Once inference is verified, this will be replaced with
 	 * the rectangle supplied by the existing face tracker.
-	 */
+		*/
 	float face_width = face_x1 - face_x0;
 	float face_height = face_y1 - face_y0;
 
 	if (face_width <= 1.0f || face_height <= 1.0f) {
 		face_found = false;
 		points.clear();
+		roi_initialized = false;
 		return false;
 	}
 
-	float center_x = (face_x0 + face_x1) * 0.5f;
-	float center_y = (face_y0 + face_y1) * 0.5f;
-
 	/*
-	* Start with 1.5x the larger dimension.
-	* We can tune this after seeing the result.
+	* Raw ROI requested by the dlib tracker.
 	*/
-	float crop_size_f = std::max(face_width, face_height) * 1.35f;
+	float target_center_x =
+		(face_x0 + face_x1) * 0.5f;
+
+	float target_center_y =
+		(face_y0 + face_y1) * 0.5f;
+
+	float target_size =
+		std::max(face_width, face_height) * 1.35f;
 
 	/*
-	* Shift slightly upward. Detector rectangles tend to leave us with
-	* more useful context below the eyes than above the forehead.
+	* Keep our calibrated downward offset.
 	*/
-	center_y += crop_size_f * 0.04f;
-
-	float crop_x_f = center_x - crop_size_f * 0.5f;
-	float crop_y_f = center_y - crop_size_f * 0.5f;
+	target_center_y += target_size * 0.04f;
 
 	/*
-	* Keep the complete square inside the source image.
+	* Stabilize the ROI before feeding it into Face Mesh.
+	*
+	* Higher alpha = more responsive.
+	* Lower alpha = more stable.
+	*
+	* Position is allowed to react somewhat faster than scale because
+	* scale jitter is especially visible as the whole mesh "breathing".
+	*/
+	constexpr float POSITION_ALPHA = 0.35f;
+	constexpr float SIZE_ALPHA = 0.20f;
+
+	if (!roi_initialized) {
+		roi_center_x = target_center_x;
+		roi_center_y = target_center_y;
+		roi_size = target_size;
+		roi_initialized = true;
+	} else {
+		roi_center_x +=
+			(target_center_x - roi_center_x) *
+			POSITION_ALPHA;
+
+		roi_center_y +=
+			(target_center_y - roi_center_y) *
+			POSITION_ALPHA;
+
+		roi_size +=
+			(target_size - roi_size) *
+			SIZE_ALPHA;
+	}
+
+	/*
+	* Convert the stabilized ROI into the square model crop.
+	*/
+	float crop_size_f = roi_size;
+	float center_x = roi_center_x;
+	float center_y = roi_center_y;
+
+	/*
+	* Don't allow a crop larger than the source.
 	*/
 	crop_size_f = std::min(
 		crop_size_f,
-		static_cast<float>(std::min(width, height)));
+		static_cast<float>(
+			std::min(width, height)));
 
+	float crop_x_f =
+		center_x - crop_size_f * 0.5f;
+
+	float crop_y_f =
+		center_y - crop_size_f * 0.5f;
+
+	/*
+	* Keep the crop inside the frame.
+	*/
 	crop_x_f = std::clamp(
 		crop_x_f,
 		0.0f,
@@ -476,6 +529,17 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 		points.clear();
 		return false;
 	}
+}
+
+void face_mesh_tracker::reset_tracking()
+{
+	points.clear();
+	face_found = false;
+
+	roi_initialized = false;
+	roi_center_x = 0.0f;
+	roi_center_y = 0.0f;
+	roi_size = 0.0f;
 }
 
 bool face_mesh_tracker::has_face() const

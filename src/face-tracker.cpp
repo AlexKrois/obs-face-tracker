@@ -838,7 +838,7 @@ static inline void draw_frame_info(struct face_tracker_filter *s, bool debug_not
 			if (draw_trk)
 				draw_rect_upsize(tr.rect);
 			if (draw_lmk && tr.landmark.size())
-				draw_landmark(tr.landmark);
+				draw_landmark(tr.landmark, s->ftm->landmark_smoothing);
 		}
 		if (debug_notrack && draw_ref) {
 			gs_effect_set_color(gs_effect_get_param_by_name(effect, "color"), 0xFFFFFF00); // amber

@@ -430,3 +430,13 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 		return false;
 	}
 }
+
+bool face_mesh_tracker::has_face() const
+{
+	return face_found;
+}
+
+const std::vector<face_mesh_point> &face_mesh_tracker::landmarks() const
+{
+	return points;
+}

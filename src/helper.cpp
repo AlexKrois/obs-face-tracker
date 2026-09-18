@@ -63,11 +63,12 @@ static void draw_mesh_connections(
 	}
 }
 
-void draw_face_mesh(const std::vector<face_mesh_point> &landmarks,
-		    float width,
-		    float height,
-		    float smoothing,
-		    float thickness)
+void draw_face_mesh(
+	const std::vector<face_mesh_point> &landmarks,
+	float width,
+	float height,
+	float smoothing,
+	float thickness)
 {
 	if (landmarks.empty())
 		return;

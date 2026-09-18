@@ -1076,15 +1076,14 @@ static void draw_frame_info(struct face_tracker_ptz *s, bool landmark_only = fal
 			const auto &tr = s->ftm->tracker_rects[i];
 			if (draw_trk)
 				draw_rect_upsize(tr.rect);
-			if (draw_lmk && tr.landmark.size())
-				if (s->ftm->mesh_tracker.has_face()) {
-					draw_face_mesh(
-						s->ftm->mesh_tracker.landmarks(),
-						(float)s->width,
-						(float)s->height,
-						s->ftm->landmark_smoothing,
-						s->ftm->landmark_thickness);
-				}
+			if (draw_lmk && s->ftm->mesh_tracker.has_face()) {
+				draw_face_mesh(
+					s->ftm->mesh_tracker.landmarks(),
+					(float)s->known_width,
+					(float)s->known_height,
+					s->ftm->landmark_smoothing,
+					s->ftm->landmark_thickness);
+			}
 		}
 
 		if (draw_ref) {

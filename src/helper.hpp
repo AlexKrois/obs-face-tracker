@@ -152,11 +152,12 @@ void draw_landmark(const std::vector<pointf_s> &landmark,
 
 struct face_mesh_point;
 
-void draw_face_mesh(const std::vector<face_mesh_point> &landmarks,
-		    float width,
-		    float height,
-		    float smoothing,
-		    float thickness);
+void draw_face_mesh(
+	const std::vector<face_mesh_point> &landmarks,
+	float width,
+	float height,
+	float smoothing,
+	float thickness);
 float landmark_area(const std::vector<pointf_s> &landmark);
 pointf_s landmark_center(const std::vector<pointf_s> &landmark);
 

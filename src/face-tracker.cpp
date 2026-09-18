@@ -832,16 +832,21 @@ static inline void draw_frame_info(struct face_tracker_filter *s, bool debug_not
 	bool draw_lmk = true;
 	bool draw_ref = false;
 
+	uint32_t width = s->width_with_aspect;
+	uint32_t height = s->height_with_aspect;
+
 	if (!debug_notrack) {
-		uint32_t width = s->width_with_aspect;
-		uint32_t height = s->height_with_aspect;
 		const float scale =
-			sqrtf((float)(width * height) / ((crop_cur.x1 - crop_cur.x0) * (crop_cur.y1 - crop_cur.y0)));
+			sqrtf((float)(width * height) /
+			      ((crop_cur.x1 - crop_cur.x0) *
+			       (crop_cur.y1 - crop_cur.y0)));
 
 		gs_matrix_push();
 		struct matrix4 tr;
 		matrix4_identity(&tr);
-		matrix4_translate3f(&tr, &tr, -(crop_cur.x0 + crop_cur.x1) * 0.5f, -(crop_cur.y0 + crop_cur.y1) * 0.5f,
+		matrix4_translate3f(&tr, &tr,
+				    -(crop_cur.x0 + crop_cur.x1) * 0.5f,
+				    -(crop_cur.y0 + crop_cur.y1) * 0.5f,
 				    0.0f);
 		matrix4_scale3f(&tr, &tr, scale, scale, 1.0f);
 		matrix4_translate3f(&tr, &tr, width / 2, height / 2, 0.0f);
@@ -860,17 +865,18 @@ static inline void draw_frame_info(struct face_tracker_filter *s, bool debug_not
 		gs_effect_set_color(gs_effect_get_param_by_name(effect, "color"), 0xFF00FF00);
 		for (size_t i = 0; i < s->ftm->tracker_rects.size(); i++) {
 			const auto &tr = s->ftm->tracker_rects[i];
+
 			if (draw_trk)
 				draw_rect_upsize(tr.rect);
-			if (draw_lmk && tr.landmark.size())
-				if (s->ftm->mesh_tracker.has_face()) {
-					draw_face_mesh(
-						s->ftm->mesh_tracker.landmarks(),
-						(float)s->width,
-						(float)s->height,
-						s->ftm->landmark_smoothing,
-						s->ftm->landmark_thickness);
-				}
+		}
+
+		if (draw_lmk && s->ftm->mesh_tracker.has_face()) {
+			draw_face_mesh(
+				s->ftm->mesh_tracker.landmarks(),
+				(float)width,
+				(float)height,
+				s->ftm->landmark_smoothing,
+				s->ftm->landmark_thickness);
 		}
 		if (debug_notrack && draw_ref) {
 			gs_effect_set_color(gs_effect_get_param_by_name(effect, "color"), 0xFFFFFF00); // amber

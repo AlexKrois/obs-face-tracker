@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <vector>
 
-#include "helper.hpp"
-
 struct face_mesh_point {
 	float x;
 	float y;

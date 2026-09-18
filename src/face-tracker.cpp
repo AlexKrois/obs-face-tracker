@@ -209,8 +209,7 @@ pointf_s landmark_center(const std::vector<pointf_s> &landmark)
  * coordinates. Only the coordinates used to draw the visible
  * landmark mesh are smoothed.
  */
-void draw_landmark(const std::vector<pointf_s> &landmark,
-		   float smoothing)
+void draw_landmark(const std::vector<pointf_s> &landmark, float smoothing)
 {
 	if (landmark.size() != 5 && landmark.size() != 68)
 		return;

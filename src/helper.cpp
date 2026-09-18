@@ -98,12 +98,8 @@ void draw_face_mesh(
 		}
 	} else {
 		for (size_t i = 0; i < landmarks.size(); i++) {
-
-			const float x =
-				landmarks[i].x * width;
-
-			const float y =
-				landmarks[i].y * height;
+			const float x = landmarks[i].x * width;
+			const float y = landmarks[i].y * height;
 
 			smoothed[i].x +=
 				(x - smoothed[i].x) * alpha;
@@ -113,12 +109,14 @@ void draw_face_mesh(
 		}
 	}
 
+	/* Main silhouette */
 	draw_mesh_connections(
 		smoothed,
 		FACE_MESH_OVAL,
 		FACE_MESH_OVAL_COUNT,
 		thickness);
 
+	/* Eyes */
 	draw_mesh_connections(
 		smoothed,
 		FACE_MESH_LEFT_EYE,
@@ -131,6 +129,7 @@ void draw_face_mesh(
 		FACE_MESH_RIGHT_EYE_COUNT,
 		thickness);
 
+	/* Eyebrows */
 	draw_mesh_connections(
 		smoothed,
 		FACE_MESH_LEFT_EYEBROW,
@@ -143,16 +142,51 @@ void draw_face_mesh(
 		FACE_MESH_RIGHT_EYEBROW_COUNT,
 		thickness);
 
+	/* Existing nose contour */
 	draw_mesh_connections(
 		smoothed,
 		FACE_MESH_NOSE,
 		FACE_MESH_NOSE_COUNT,
 		thickness);
 
+	/* Lips */
 	draw_mesh_connections(
 		smoothed,
 		FACE_MESH_LIPS,
 		FACE_MESH_LIPS_COUNT,
+		thickness);
+
+	/* Forehead / center line */
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_CENTER,
+		FACE_MESH_CENTER_COUNT,
+		thickness);
+
+	/* Left and right cheek structure */
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_LEFT_CHEEK,
+		FACE_MESH_LEFT_CHEEK_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_RIGHT_CHEEK,
+		FACE_MESH_RIGHT_CHEEK_COUNT,
+		thickness);
+
+	/* Under-eye / upper-cheek contours */
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_LEFT_MIDFACE,
+		FACE_MESH_LEFT_MIDFACE_COUNT,
+		thickness);
+
+	draw_mesh_connections(
+		smoothed,
+		FACE_MESH_RIGHT_MIDFACE,
+		FACE_MESH_RIGHT_MIDFACE_COUNT,
 		thickness);
 }
 

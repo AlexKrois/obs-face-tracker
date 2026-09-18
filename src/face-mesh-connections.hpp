@@ -176,6 +176,101 @@ inline constexpr face_mesh_connection FACE_MESH_LIPS[] = {
 	{191, 78}
 };
 
+/*
+ * Additional structural contours.
+ *
+ * These deliberately use only a small subset of the 468-point topology.
+ * The goal is a clean stylized face mesh rather than the complete
+ * MediaPipe triangulation.
+ */
+
+/* Nose bridge / center forehead */
+inline constexpr int FACE_MESH_CENTER[] = {
+	10, 151,
+	151, 9,
+	9, 8,
+	8, 168,
+	168, 6,
+	6, 197,
+	197, 195,
+	195, 5,
+	5, 4,
+	4, 1
+};
+
+inline constexpr size_t FACE_MESH_CENTER_COUNT =
+	sizeof(FACE_MESH_CENTER) /
+	sizeof(FACE_MESH_CENTER[0]);
+
+/* Left cheek structure */
+inline constexpr int FACE_MESH_LEFT_CHEEK[] = {
+	234, 93,
+	93, 132,
+	132, 58,
+	58, 172,
+	172, 136,
+	136, 150,
+
+	127, 123,
+	123, 50,
+	50, 101,
+	101, 205,
+	205, 36
+};
+
+inline constexpr size_t FACE_MESH_LEFT_CHEEK_COUNT =
+	sizeof(FACE_MESH_LEFT_CHEEK) /
+	sizeof(FACE_MESH_LEFT_CHEEK[0]);
+
+/* Right cheek structure */
+inline constexpr int FACE_MESH_RIGHT_CHEEK[] = {
+	454, 323,
+	323, 361,
+	361, 288,
+	288, 397,
+	397, 365,
+	365, 379,
+
+	356, 352,
+	352, 280,
+	280, 330,
+	330, 425,
+	425, 266
+};
+
+inline constexpr size_t FACE_MESH_RIGHT_CHEEK_COUNT =
+	sizeof(FACE_MESH_RIGHT_CHEEK) /
+	sizeof(FACE_MESH_RIGHT_CHEEK[0]);
+
+/* Under-eye / upper-cheek contours */
+inline constexpr int FACE_MESH_LEFT_MIDFACE[] = {
+	33, 130,
+	130, 117,
+	117, 118,
+	118, 119,
+	119, 120,
+	120, 121,
+	121, 128
+};
+
+inline constexpr size_t FACE_MESH_LEFT_MIDFACE_COUNT =
+	sizeof(FACE_MESH_LEFT_MIDFACE) /
+	sizeof(FACE_MESH_LEFT_MIDFACE[0]);
+
+inline constexpr int FACE_MESH_RIGHT_MIDFACE[] = {
+	263, 359,
+	359, 346,
+	346, 347,
+	347, 348,
+	348, 349,
+	349, 350,
+	350, 357
+};
+
+inline constexpr size_t FACE_MESH_RIGHT_MIDFACE_COUNT =
+	sizeof(FACE_MESH_RIGHT_MIDFACE) /
+	sizeof(FACE_MESH_RIGHT_MIDFACE[0]);
+
 inline constexpr size_t FACE_MESH_OVAL_COUNT =
 	sizeof(FACE_MESH_OVAL) / sizeof(FACE_MESH_OVAL[0]);
 

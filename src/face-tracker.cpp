@@ -752,6 +752,7 @@ static inline std::shared_ptr<texture_object> surface_to_cvtex(struct face_track
 {
 	uint8_t *video_data = NULL;
 	uint32_t video_linesize;
+
 	if (!gs_stagesurface_map(s->stagesurface, &video_data, &video_linesize))
 		return NULL;
 
@@ -764,12 +765,21 @@ static inline std::shared_ptr<texture_object> surface_to_cvtex(struct face_track
 
 	struct obs_source_frame frame;
 	memset(&frame, 0, sizeof(frame));
+
 	frame.data[0] = video_data;
 	frame.linesize[0] = video_linesize;
 	frame.width = width;
 	frame.height = height;
 	frame.format = VIDEO_FORMAT_BGRA;
+
 	cvtex->set_texture_obsframe(&frame, 1);
+
+	s->ftm->mesh_tracker.process_frame(
+		video_data,
+		(int)width,
+		(int)height,
+		(int)video_linesize,
+		(int64_t)s->ftm->tick_cnt);
 
 	gs_stagesurface_unmap(s->stagesurface);
 

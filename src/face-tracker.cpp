@@ -802,10 +802,10 @@ static inline void draw_frame_texture(struct face_tracker_filter *s, bool debug_
 static inline void draw_frame_info(struct face_tracker_filter *s, bool debug_notrack, bool landmark_only = false)
 {
 	const rectf_s &crop_cur = s->ftm->crop_cur;
-	bool draw_det = !landmark_only;
-	bool draw_trk = !landmark_only;
+	bool draw_det = false;
+	bool draw_trk = false;
 	bool draw_lmk = true;
-	bool draw_ref = !landmark_only;
+	bool draw_ref = false;
 
 	if (!debug_notrack) {
 		uint32_t width = s->width_with_aspect;

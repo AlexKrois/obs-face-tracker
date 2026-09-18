@@ -60,6 +60,32 @@ jobs:
           cp dlib/LICENSE.txt data/LICENSE-dlib
           cp dlib-models/LICENSE data/LICENSE-dlib-models
 
+      - name: Download ONNX Runtime
+        shell: pwsh
+        run: |
+          $version = "1.28.2"
+          $url = "https://github.com/microsoft/onnxruntime/releases/download/v$version/onnxruntime-win-x64-$version.zip"
+
+          Invoke-WebRequest -Uri $url -OutFile onnxruntime.zip
+          Expand-Archive onnxruntime.zip -DestinationPath onnxruntime-temp
+
+          New-Item -ItemType Directory -Force -Path deps/onnxruntime | Out-Null
+
+          Copy-Item "onnxruntime-temp/onnxruntime-win-x64-$version/include" `
+                    "deps/onnxruntime/include" -Recurse
+
+          Copy-Item "onnxruntime-temp/onnxruntime-win-x64-$version/lib" `
+                    "deps/onnxruntime/lib" -Recurse
+
+      - name: Download Face Mesh model
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path data/face_mesh | Out-Null
+
+          Invoke-WebRequest `
+            -Uri "https://github.com/yakhyo/mediapipe-face-mesh-onnx/releases/download/weights/face_mesh_Nx3x192x192.onnx" `
+            -OutFile "data/face_mesh/face_mesh.onnx"
+
       - name: Build plugin
         run: |
           $CmakeArgs = @(

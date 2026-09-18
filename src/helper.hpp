@@ -146,7 +146,7 @@ static inline rectf_s f3_to_rectf(const f3 &u, float w, float h)
 
 void draw_rect_upsize(rect_s r, float upsize_l = 0.0f, float upsize_r = 0.0f, float upsize_t = 0.0f,
 		      float upsize_b = 0.0f);
-void draw_landmark(const std::vector<pointf_s> &landmark);
+void draw_landmark(const std::vector<pointf_s> &landmark, float smoothing);
 float landmark_area(const std::vector<pointf_s> &landmark);
 pointf_s landmark_center(const std::vector<pointf_s> &landmark);
 

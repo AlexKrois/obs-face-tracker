@@ -782,12 +782,20 @@ static inline std::shared_ptr<texture_object> surface_to_cvtex(struct face_track
 
 	cvtex->set_texture_obsframe(&frame, 1);
 
-	s->ftm->mesh_tracker.process_frame(
-		video_data,
-		(int)width,
-		(int)height,
-		(int)video_linesize,
-		(int64_t)s->ftm->tick_cnt);
+	if (!s->ftm->tracker_rects.empty()) {
+		const auto &face = s->ftm->tracker_rects[0].rect;
+
+		s->ftm->mesh_tracker.process_frame(
+			video_data,
+			(int)width,
+			(int)height,
+			(int)video_linesize,
+			(int64_t)s->ftm->tick_cnt,
+			face.x0,
+			face.y0,
+			face.x1,
+			face.y1);
+	}
 
 	gs_stagesurface_unmap(s->stagesurface);
 

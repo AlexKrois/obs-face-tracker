@@ -206,7 +206,11 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 				      int width,
 				      int height,
 				      int stride,
-				      int64_t timestamp_ms)
+				      int64_t timestamp_ms,
+				      float face_x0,
+				      float face_y0,
+				      float face_x1,
+				      float face_y1)
 {
 	(void)timestamp_ms;
 
@@ -230,10 +234,53 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 	 * Once inference is verified, this will be replaced with
 	 * the rectangle supplied by the existing face tracker.
 	 */
-	const int crop_size = std::min(width, height);
-	const int crop_x = (width - crop_size) / 2;
-	const int crop_y = (height - crop_size) / 2;
+	float face_width = face_x1 - face_x0;
+	float face_height = face_y1 - face_y0;
 
+	if (face_width <= 1.0f || face_height <= 1.0f) {
+		face_found = false;
+		points.clear();
+		return false;
+	}
+
+	float center_x = (face_x0 + face_x1) * 0.5f;
+	float center_y = (face_y0 + face_y1) * 0.5f;
+
+	/*
+	* Start with 1.5x the larger dimension.
+	* We can tune this after seeing the result.
+	*/
+	float crop_size_f = std::max(face_width, face_height) * 1.5f;
+
+	/*
+	* Shift slightly upward. Detector rectangles tend to leave us with
+	* more useful context below the eyes than above the forehead.
+	*/
+	center_y -= crop_size_f * 0.05f;
+
+	float crop_x_f = center_x - crop_size_f * 0.5f;
+	float crop_y_f = center_y - crop_size_f * 0.5f;
+
+	/*
+	* Keep the complete square inside the source image.
+	*/
+	crop_size_f = std::min(
+		crop_size_f,
+		static_cast<float>(std::min(width, height)));
+
+	crop_x_f = std::clamp(
+		crop_x_f,
+		0.0f,
+		static_cast<float>(width) - crop_size_f);
+
+	crop_y_f = std::clamp(
+		crop_y_f,
+		0.0f,
+		static_cast<float>(height) - crop_size_f);
+
+	const float crop_size = crop_size_f;
+	const float crop_x = crop_x_f;
+	const float crop_y = crop_y_f;
 	/*
 	 * Model input:
 	 *

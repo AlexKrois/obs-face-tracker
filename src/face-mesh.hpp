@@ -26,7 +26,11 @@ public:
 		int width,
 		int height,
 		int stride,
-		int64_t timestamp_ms);
+		int64_t timestamp_ms,
+		float face_x0,
+		float face_y0,
+		float face_x1,
+		float face_y1);
 
 	bool has_face() const;
 

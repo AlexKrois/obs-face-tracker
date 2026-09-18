@@ -231,7 +231,8 @@ pointf_s landmark_center(const std::vector<pointf_s> &landmark)
  *
  * The raw landmark vector is NOT modified.
  */
-void draw_landmark(const std::vector<pointf_s> &landmark, float smoothing);
+void draw_landmark(const std::vector<pointf_s> &landmark,
+		   float smoothing)
 {
 	if (landmark.size() != 5 && landmark.size() != 68)
 		return;

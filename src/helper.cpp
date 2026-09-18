@@ -20,8 +20,8 @@
  * Values are approximately source-image pixels.
  */
 
-static constexpr float DEBUG_RECT_THICKNESS = 8.0f;
-static constexpr float DEBUG_LANDMARK_THICKNESS = 5.0f;
+static constexpr float DEBUG_RECT_THICKNESS = 8.1f;
+static constexpr float DEBUG_LANDMARK_THICKNESS = 5.1f;
 
 
 /*

@@ -250,13 +250,13 @@ bool face_mesh_tracker::process_frame(const uint8_t *data,
 	* Start with 1.5x the larger dimension.
 	* We can tune this after seeing the result.
 	*/
-	float crop_size_f = std::max(face_width, face_height) * 1.5f;
+	float crop_size_f = std::max(face_width, face_height) * 1.35f;
 
 	/*
 	* Shift slightly upward. Detector rectangles tend to leave us with
 	* more useful context below the eyes than above the forehead.
 	*/
-	center_y -= crop_size_f * 0.05f;
+	center_y += crop_size_f * 0.04f;
 
 	float crop_x_f = center_x - crop_size_f * 0.5f;
 	float crop_y_f = center_y - crop_size_f * 0.5f;
